@@ -51,11 +51,6 @@ public class TicTacToeGame{
 
   public static int testCount = 0;
 
-  public static Character[] diaginalArray;
-
-
-
-
 
   /** Checks for a win based on the last symbol played in the game
    *
@@ -71,7 +66,7 @@ public class TicTacToeGame{
    */
   public static int win(int last_row_played, int last_column_played){
     char player = board[last_row_played][last_column_played];
-
+    int diagCheck = 0;
 /////////////////////////////////////////////////////////////////////////
     //check column
     for (int c = 0; c < columns; c++) {
@@ -112,24 +107,17 @@ public class TicTacToeGame{
 
     }
 /////////////////////////////////////////////////////////////////////////
-    //check diagonal
+//diagonal
 
-    int loopCount = (row * columns)-1;
-    int upCount = 1;
-    int downCount = 1;
-    int totalCount = 0;
-    int diagTotal = 0;
-    while (loopCount > 0) {
-      for (int u = 0; u <= upCount; u++) {
-        diagonalArray[totalCount] = board[diagTotal-u][u];
-      }
+    diagCheck = diagonalCheck(last_row_played,last_column_played);
+    if (diagCheck == 1) {
+      gameData[3] += 1;
+      stats(1,currentPlayer);
+      gameOver();
+      return -1;
     }
 
-
-
-
-
-
+/////////////////////////////////////////////////////////////////////////
     if (playCount == (rows*columns)-1) {
       gameData[3] += 1;
       System.out.println("Draw!");
@@ -186,17 +174,17 @@ public class TicTacToeGame{
     String         line;
 
     try{
-      file = new FileReader(file_name);
-      file_input = new BufferedReader(file);
+      file            = new FileReader(file_name);
+      file_input      = new BufferedReader(file);
 
-      line = file_input.readLine();
-      rows = Integer.parseInt(line);
+      line            = file_input.readLine();
+      rows            = Integer.parseInt(line);
 
-      line = file_input.readLine();
-      columns = Integer.parseInt(line);
+      line            = file_input.readLine();
+      columns         = Integer.parseInt(line);
 
-      line = file_input.readLine();
-      win_condition = Integer.parseInt(line);
+      line            = file_input.readLine();
+      win_condition   = Integer.parseInt(line);
 
       /* always close your files you are done with them! */
       file_input.close();
@@ -218,9 +206,8 @@ public class TicTacToeGame{
     /* create and initialize the game board */
 
     /* allocate memory for the board array */
-    board = new Character[rows][columns];
-    diaginalArray = new Character[rows*columns];
-    gameData = new int[5];
+    board     = new Character[rows][columns];
+    gameData  = new int[5];
 
     /** game data array
        0 : games played
@@ -243,6 +230,63 @@ public class TicTacToeGame{
   }
 //////////////////////////////////METHODS//////////////////////////////////
 
+  //method for diagonal check
+  public static int diagonalCheck(int row, int col) {
+    int upRight   = 0;
+    int downRight = 0;
+    int upLeft    = 0;
+    int downLeft  = 0;
+    int diagCount = 0;
+    while(diagCount < win_condition) {
+      //upRight
+      try {
+        if (board[row][col] == board[row+diagCount][col+diagCount]) {
+          upRight += 1;
+        }
+      } catch (Exception ur) {
+        //
+      }
+
+      //downRight
+      try {
+        if (board[row][col] == board[row-diagCount][col+diagCount]) {
+          downRight += 1;
+        }
+      } catch (Exception dr) {
+        //
+      }
+
+      //upLeft
+      try {
+        if (board[row][col] == board[row+diagCount][col-diagCount]) {
+          upLeft += 1;
+        }
+      } catch (Exception ul) {
+        //
+      }
+
+      //downLeft
+      try {
+        if (board[row][col] == board[row-diagCount][col-diagCount]) {
+          downLeft += 1;
+        }
+      } catch (Exception dl) {
+        //
+      }
+      diagCount += 1;
+    }
+    if (
+    (upRight == win_condition) ||
+    (downRight == win_condition) ||
+    (upLeft == win_condition) ||
+    (downLeft == win_condition)) {
+
+      System.out.println("Diagonal Win! at : "+row +""+ col);
+      return 1;
+    }
+    return 0;
+  }
+
   //game over display stats
   public static void gameOver() {
     Scanner keyboard;
@@ -260,7 +304,7 @@ public class TicTacToeGame{
     System.out.println("Would you like to play again?");
     //game = keyboard.next();
     testCount += 1;
-    if (testCount < 15) {
+    if (testCount < 1) {
       gameInit();
     }
 
